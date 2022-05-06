@@ -14,6 +14,7 @@ namespace LiveCoding.Api.Controllers
             this.cashflowService = cashflowService;
         }
 
+        [HttpGet]
         public int Get(DateTime date)
         {
             return cashflowService.ComputeCashflow(date);
