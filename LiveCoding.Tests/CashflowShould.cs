@@ -1,23 +1,42 @@
-using System;
 using LiveCoding.Api.Controllers;
+using LiveCoding.Persistence;
 using LiveCoding.Services;
 using NFluent;
 using Xunit;
 
 namespace LiveCoding.Tests
 {
-    public class CashflowShould
+    public class ReservationShould
     {
-        [Theory]
-        [InlineData(new[] { 10, 5 }, 15)]
-        [InlineData(new[] { 10, -5 }, 5)]
-        public void Have_correct_cashflow(int[] transactionAmounts, int expectedCashflow)
+        [Fact]
+        public void Reserve_bar_when_60_percent_of_devs_are_available()
         {
-            var service = new CashflowController(new CashflowService(new FakeTransactionRepository(transactionAmounts)));
+            var endpoint = new ReservationController(new ReservationService(new FakeBarRepository(new BarData[0])));
+            Check.That(true).IsTrue();
+        }
 
-            var result = service.Get(DateTime.Today);
+        [Fact]
+        public void Do_not_reserve_bar_when_50_percent_of_devs_are_available()
+        {
+            Check.That(true).IsTrue();
+        }
 
-            Check.That(result).IsEqualTo(expectedCashflow);
+        [Fact]
+        public void Reserve_bar_when_it_is_open()
+        {
+            Check.That(true).IsTrue();
+        }
+
+        [Fact]
+        public void Do_not_reserve_bar_when_it_is_closed()
+        {
+            Check.That(true).IsTrue();
+        }
+
+        [Fact]
+        public void Choose_bar_that_has_enough_space()
+        {
+            Check.That(true).IsTrue();
         }
     }
 }

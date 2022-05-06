@@ -7,8 +7,10 @@ namespace LiveCoding.Api
     {
         public static IServiceCollection InitializeDependencyInjection(this IServiceCollection services)
         {
-            return services.AddScoped<ITransactionRepository, TransactionRepository>()
-                .AddScoped<CashflowService>();
+            return services
+                .AddScoped<IBarRepository, BarRepository>()
+                .AddScoped<IDevRepository, DevRepository>()
+                .AddScoped<ReservationService>();
         }
     }
 }
