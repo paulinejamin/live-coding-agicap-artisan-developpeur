@@ -1,6 +1,6 @@
-﻿namespace LiveCoding.Persistence;
+﻿namespace LiveCoding.Infra;
 
-public record DevData
+public class DevData
 {
     public string Name { get; set; }
     public DateTime[] OnSite { get; set; }

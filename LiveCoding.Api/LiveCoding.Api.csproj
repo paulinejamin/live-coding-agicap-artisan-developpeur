@@ -11,6 +11,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\LiveCoding.Domain\LiveCoding.Domain.csproj" />
+    <ProjectReference Include="..\LiveCoding.Infra\LiveCoding.Infra.csproj" />
     <ProjectReference Include="..\LiveCoding.Services\LiveCoding.Services.csproj" />
   </ItemGroup>
 

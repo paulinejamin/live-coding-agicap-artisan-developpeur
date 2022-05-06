@@ -1,4 +1,4 @@
-namespace LiveCoding.Persistence;
+namespace LiveCoding.Infra;
 
 public class BoatData
 {

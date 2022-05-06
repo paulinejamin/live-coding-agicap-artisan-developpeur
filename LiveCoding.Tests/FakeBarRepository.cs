@@ -1,6 +1,5 @@
 using System.Collections.Generic;
-using System.Linq;
-using LiveCoding.Persistence;
+using LiveCoding.Infra;
 
 namespace LiveCoding.Tests;
 
@@ -8,7 +7,7 @@ public class FakeBarRepository : IBarRepository
 {
     private readonly IEnumerable<BarData> _bars;
 
-    public FakeBarRepository(BarData[] barDatas)
+    public FakeBarRepository(IEnumerable<BarData> barData)
     {
         _bars = barDatas;
     }

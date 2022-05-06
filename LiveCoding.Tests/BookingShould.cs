@@ -1,8 +1,9 @@
 using System;
 using System.Linq;
 using LiveCoding.Api.Controllers;
-using LiveCoding.Persistence;
-using LiveCoding.Services;
+using LiveCoding.Domain.UseCases;
+using LiveCoding.Infra;
+using LiveCoding.Infra.Adapters;
 using NFluent;
 using Xunit;
 
@@ -88,7 +89,7 @@ namespace LiveCoding.Tests
         {
             var indoorBars = new[]
             {
-                ABar() with { Name = "La belle équipe", Open = new[] { DayOfWeek.Thursday } },
+                ABar() with { Name = "La belle Equipe", Open = new[] { DayOfWeek.Thursday } },
                 ABar() with { Name = "Le Sirius", Open = new[] { DayOfWeek.Friday } }
             };
             var developers = new[]
@@ -161,7 +162,6 @@ namespace LiveCoding.Tests
             Capacity: 10,
             Open: new[] { DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday }
         );
-
 
         private static readonly DateTime Wednesday = new(2022, 05, 11);
         private static readonly DateTime Thursday = Wednesday.AddDays(1);

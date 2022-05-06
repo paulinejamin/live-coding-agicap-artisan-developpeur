@@ -1,4 +1,4 @@
-﻿namespace LiveCoding.Services;
+﻿namespace LiveCoding.Domain;
 
 public class Booking
 {
@@ -10,7 +10,7 @@ public class Booking
 
     public DateTime Date { get; }
     public Bar Bar { get; }
-
+    
     public static Booking Make(BestDate bestDate, IEnumerable<Bar> bars)
     {
         foreach (var bar in bars.OrderByDescending(bar => bar.IsFavorite))

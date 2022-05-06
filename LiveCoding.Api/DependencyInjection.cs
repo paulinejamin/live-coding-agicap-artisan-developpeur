@@ -1,5 +1,5 @@
-﻿using LiveCoding.Persistence;
-using LiveCoding.Services;
+using LiveCoding.Domain.UseCases;
+using LiveCoding.Infra;
 
 namespace LiveCoding.Api
 {
@@ -10,7 +10,7 @@ namespace LiveCoding.Api
             return services
                 .AddScoped<IBarRepository, BarRepository>()
                 .AddScoped<IDevRepository, DevRepository>()
-                .AddScoped<BookingService>();
+                .AddScoped<MakeABooking>();
         }
     }
 }

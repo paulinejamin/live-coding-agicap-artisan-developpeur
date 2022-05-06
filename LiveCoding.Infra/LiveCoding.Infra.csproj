@@ -8,20 +8,28 @@
 
   <ItemGroup>
     <None Remove="bars.json" />
+    <None Remove="boats.json" />
     <None Remove="devs.json" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="devs.json">
+    <Content Include="Data\bars.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="bars.json">
+    <Content Include="Data\boats.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\devs.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LiveCoding.Domain\LiveCoding.Domain.csproj" />
   </ItemGroup>
 
 </Project>

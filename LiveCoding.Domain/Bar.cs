@@ -1,4 +1,4 @@
-﻿namespace LiveCoding.Services;
+﻿namespace LiveCoding.Domain;
 
 public record Bar(BarName Name, Capacity Capacity, DayOfWeek[] OpenDays, bool IsFavorite)
 {
