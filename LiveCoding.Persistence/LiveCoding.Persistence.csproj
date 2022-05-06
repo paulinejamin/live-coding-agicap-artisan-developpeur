@@ -6,8 +6,4 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\LiveCoding.Persistence\LiveCoding.Persistence.csproj" />
-  </ItemGroup>
-
 </Project>
