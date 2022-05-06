@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\LiveCoding.Services\LiveCoding.Services.csproj" />
+    <ProjectReference Include="..\LiveCoding.Api\LiveCoding.Api.csproj" />
   </ItemGroup>
 
 </Project>
