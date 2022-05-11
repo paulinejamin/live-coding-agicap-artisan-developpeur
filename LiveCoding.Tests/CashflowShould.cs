@@ -11,7 +11,7 @@ namespace LiveCoding.Tests
         [Fact]
         public void Reserve_bar_when_60_percent_of_devs_are_available()
         {
-            var endpoint = new ReservationController(new ReservationService(new FakeBarRepository(new BarData[0])));
+            var endpoint = new ReservationController(new ReservationService(new FakeBarRepository(new BarData[0]), new FakeDevRepository(new DevData[0])));
             Check.That(true).IsTrue();
         }
 

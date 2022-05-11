@@ -13,7 +13,7 @@ namespace LiveCoding.Services
             this.devRepo = devRepo;
         }
 
-        public int ReserveBar(DateTime dateTime)
+        public Tuple<DateTime, BarData> ReserveBar()
         {
             var bars = barRepo.Get();
             var devs = devRepo.Get();
@@ -44,16 +44,15 @@ namespace LiveCoding.Services
                     bar = barData;
                 }
             }
-
-            BookBar(bar);
-
-            return max;
+            var dateTime = dictionary.First(kv => kv.Value == max).Key;
+            BookBar(bar, dateTime);
+            return new Tuple<DateTime, BarData>(dateTime, bar);
         }
 
-        private void BookBar(BarData barData)
+        private void BookBar(BarData barData, DateTime dateTime)
         {
             // TODO send an email ? 
-            throw new NotImplementedException();
+            Console.WriteLine("Bar booked: " + barData.Name + " at " + dateTime);
         }
     }
 }

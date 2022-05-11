@@ -1,3 +1,4 @@
+using LiveCoding.Persistence;
 using LiveCoding.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,9 +16,9 @@ namespace LiveCoding.Api.Controllers
         }
 
         [HttpGet]
-        public int Get(DateTime date)
+        public Tuple<DateTime, BarData> Get()
         {
-            return reservationService.ReserveBar(date);
+            return reservationService.ReserveBar();
         }
     }
 }
