@@ -140,5 +140,24 @@ namespace LiveCoding.Tests
             Check.That(result.Item1).IsEqualTo(null);
             Check.That(result.Item2).IsEqualTo(null);
         }
+
+        [Fact]
+        public void Choose_boat_over_bar_when_available()
+        {
+
+        }
+
+        [Fact]
+        public void Choose_bar_when_no_boat_available()
+        {
+
+        }
+
+        [Fact]
+        public void Do_not_reserve_boat_when_Agicap_devs_fill_more_than_80_percent()
+        {
+
+        }
+
     }
 }
