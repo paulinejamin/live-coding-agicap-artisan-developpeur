@@ -18,7 +18,42 @@ namespace LiveCoding.Services
             var bars = barRepo.Get();
             var devs = devRepo.Get();
 
-            return 0;
+            Dictionary<DateTime, int> dictionary = new Dictionary<DateTime, int>();
+            foreach (var devData in devs)
+            {
+                foreach (var date in devData.OnSite)
+                {
+                    if (dictionary.ContainsKey(date))
+                    {
+                        dictionary[date]++;
+                    }
+                    else
+                    {
+                        dictionary.Add(date, 1);
+                    }
+                }
+            }
+
+            var max = dictionary.Values.Max();
+
+            var bar = new BarData();
+            foreach (var barData in bars)
+            {
+                if (barData.Capacity <= max * 0.6)
+                {
+                    bar = barData;
+                }
+            }
+
+            BookBar(bar);
+
+            return max;
+        }
+
+        private void BookBar(BarData barData)
+        {
+            // TODO send an email ? 
+            throw new NotImplementedException();
         }
     }
 }
