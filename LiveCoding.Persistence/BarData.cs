@@ -1,6 +1,6 @@
 ﻿namespace LiveCoding.Persistence;
 
-public class BarData
+public record BarData
 {
     public string Name { get; set; }
     public int Capacity { get; set; }
