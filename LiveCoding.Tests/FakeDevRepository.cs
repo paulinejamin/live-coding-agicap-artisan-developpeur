@@ -10,7 +10,7 @@ public class FakeDevRepository : IDevRepository
 
     public FakeDevRepository(DevData[] devDatas)
     {
-        devs = devDatas.Select(a => new DevData());
+        devs = devDatas;
     }
 
     public IEnumerable<DevData> Get()

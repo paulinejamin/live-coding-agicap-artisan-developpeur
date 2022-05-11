@@ -10,7 +10,7 @@ public class FakeBarRepository : IBarRepository
 
     public FakeBarRepository(BarData[] barDatas)
     {
-        bars = barDatas.Select(a => new BarData());
+        bars = barDatas;
     }
 
     public IEnumerable<BarData> Get()

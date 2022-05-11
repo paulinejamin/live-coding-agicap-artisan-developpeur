@@ -13,7 +13,7 @@ namespace LiveCoding.Services
             this.devRepo = devRepo;
         }
 
-        public Tuple<DateTime, BarData> ReserveBar()
+        public Tuple<DateTime?, BarData?> ReserveBar()
         {
             var bars = barRepo.Get();
             var devs = devRepo.Get();
@@ -36,17 +36,24 @@ namespace LiveCoding.Services
 
             var max = dictionary.Values.Max();
 
+            if (max <= devs.Count() * 0.6)
+            {
+                return new Tuple<DateTime?, BarData?>(null, null);
+            }
+            
+            var dateTime = dictionary.First(kv => kv.Value == max).Key;
+
             var bar = new BarData();
             foreach (var barData in bars)
             {
-                if (barData.Capacity <= max * 0.6)
+                if (barData.Capacity >= max && barData.Open.Contains(dateTime.DayOfWeek))
                 {
                     bar = barData;
                 }
             }
-            var dateTime = dictionary.First(kv => kv.Value == max).Key;
+
             BookBar(bar, dateTime);
-            return new Tuple<DateTime, BarData>(dateTime, bar);
+            return new Tuple<DateTime?, BarData?>(dateTime, bar);
         }
 
         private void BookBar(BarData barData, DateTime dateTime)

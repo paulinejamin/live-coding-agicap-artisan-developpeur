@@ -1,0 +1,106 @@
+using System;
+using LiveCoding.Api.Controllers;
+using LiveCoding.Persistence;
+using LiveCoding.Services;
+using NFluent;
+using Xunit;
+
+namespace LiveCoding.Tests
+{
+    public class ReservationShould
+    {
+        [Fact]
+        public void Reserve_bar_when_at_least_60_percent_of_devs_are_available()
+        {
+            var expectedBar = "My bar";
+            var barData = new BarData[]
+            {
+                new BarData() { Capacity = 10, Food = false, Name = expectedBar, Open = new[] { DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday } }
+            };
+            var wednesday = new DateTime(2022, 05, 11);
+            var thursday = wednesday.AddDays(1);
+            var friday = wednesday.AddDays(2);
+            var devData = new DevData[]
+            {
+                new DevData() { Name = "Bob 1", OnSite = new DateTime[] { wednesday, thursday, friday } },
+                new DevData() { Name = "Bob 2", OnSite = new DateTime[] { thursday } },
+                new DevData() { Name = "Bob 3", OnSite = new DateTime[] { friday } },
+                new DevData() { Name = "Bob 4", OnSite = new DateTime[] { wednesday, thursday } },
+                new DevData() { Name = "Bob 5", OnSite = new DateTime[] { thursday } },
+            };
+            var endpoint =
+                new ReservationController(new ReservationService(new FakeBarRepository(barData),
+                    new FakeDevRepository(devData)));
+
+            var result = endpoint.Get();
+
+            Check.That(result.Item1).IsEqualTo(thursday);
+            Check.That(result.Item2.Name).IsEqualTo(expectedBar);
+        }
+
+        [Fact]
+        public void Do_not_reserve_bar_when_only_50_percent_of_devs_are_available()
+        {
+            var expectedBar = "My bar";
+            var barData = new BarData[]
+            {
+                new BarData() { Capacity = 10, Food = false, Name = expectedBar, Open = new[] { DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday } }
+            };
+            var wednesday = new DateTime(2022, 05, 11);
+            var thursday = wednesday.AddDays(1);
+            var friday = wednesday.AddDays(2);
+            var devData = new DevData[]
+            {
+                new DevData() { Name = "Bob 1", OnSite = new DateTime[] { wednesday, friday } },
+                new DevData() { Name = "Bob 2", OnSite = new DateTime[] { thursday } },
+                new DevData() { Name = "Bob 3", OnSite = new DateTime[] { friday } },
+                new DevData() { Name = "Bob 4", OnSite = new DateTime[] { wednesday } },
+                new DevData() { Name = "Bob 5", OnSite = new DateTime[] { thursday } },
+            };
+            var endpoint =
+                new ReservationController(new ReservationService(new FakeBarRepository(barData),
+                    new FakeDevRepository(devData)));
+
+            var result = endpoint.Get();
+
+            Check.That(result.Item1).IsEqualTo(null);
+            Check.That(result.Item2).IsEqualTo(null);
+        }
+
+        [Fact]
+        public void Reserve_bar_when_it_is_open()
+        {
+            var expectedBar = "My bar";
+            var barData = new BarData[]
+            {
+                new BarData() { Capacity = 10, Food = false, Name = expectedBar, Open = new[] { DayOfWeek.Thursday } },
+                new BarData() { Capacity = 20, Food = false, Name = "Le Sirius", Open = new[] { DayOfWeek.Friday } }
+            };
+            var thursday = new DateTime(2022, 05, 12);
+            var devData = new DevData[]
+            {
+                new DevData() { Name = "Bob", OnSite = new DateTime[] { thursday } },
+                new DevData() { Name = "Alice", OnSite = new DateTime[] { thursday } }
+            };
+            var endpoint = new ReservationController(new ReservationService(new FakeBarRepository(barData),
+                    new FakeDevRepository(devData)));
+
+            var result = endpoint.Get();
+
+            Check.That(result.Item1).IsEqualTo(thursday);
+            Check.That(result.Item2.Name).IsEqualTo(expectedBar);
+        }
+
+        [Fact]
+        public void Do_not_reserve_bar_when_it_is_closed()
+        {
+            Check.That(true).IsTrue();
+        }
+
+        [Fact]
+        public void Choose_bar_that_has_enough_space()
+        {
+            Check.That(true).IsTrue();
+        }
+    }
+}
