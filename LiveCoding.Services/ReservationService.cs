@@ -43,17 +43,16 @@ namespace LiveCoding.Services
             
             var dateTime = dictionary.First(kv => kv.Value == max).Key;
 
-            var bar = new BarData();
             foreach (var barData in bars)
             {
                 if (barData.Capacity >= max && barData.Open.Contains(dateTime.DayOfWeek))
                 {
-                    bar = barData;
+                    BookBar(barData, dateTime);
+                    return new Tuple<DateTime?, BarData?>(dateTime, barData);
                 }
             }
-
-            BookBar(bar, dateTime);
-            return new Tuple<DateTime?, BarData?>(dateTime, bar);
+            
+            return new Tuple<DateTime?, BarData?>(null, null);
         }
 
         private void BookBar(BarData barData, DateTime dateTime)
