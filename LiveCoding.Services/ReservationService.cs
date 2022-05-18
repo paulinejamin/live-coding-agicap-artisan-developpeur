@@ -37,32 +37,19 @@ namespace LiveCoding.Services
                 }
             }
 
-            var max = dictionary.Values.Max();
+            var numberOfDevsAvailable = dictionary.Values.Max();
 
-            if (max <= devs.Count() * 0.6)
+            if (numberOfDevsAvailable <= devs.Count() * 0.6)
             {
                 return null;
             }
 
-            var dateTime = dictionary.First(kv => kv.Value == max).Key;
+            var dateTime = dictionary.First(kv => kv.Value == numberOfDevsAvailable).Key;
 
-
-            foreach (var boatData in boats)
-            {
-                BookBoat(boatData, dateTime);
-                return new Reservation(dateTime, new BarName(boatData.Name));
-            }
-
-            foreach (var barData in bars)
-            {
-                if (barData.Capacity >= max && barData.Open.Contains(dateTime.DayOfWeek))
-                {
-                    BookBar(barData, dateTime);
-                    return new Reservation(dateTime, new BarName(barData.Name));
-                }
-            }
-
-            return null;
+            var allBars = bars.Select(bar => new Bar(new BarName(bar.Name), bar.Capacity, bar.Open, false))
+                .Concat(boats.Select(boat => new Bar(new BarName(boat.Name), boat.MaxPeople, Enum.GetValues<DayOfWeek>(), true)))
+                .ToList();
+            return Reservation.MakeReservation(allBars, dateTime, numberOfDevsAvailable);
         }
 
         private void BookBoat(BoatData boatData, DateTime dateTime)
@@ -80,7 +67,7 @@ namespace LiveCoding.Services
 
     public class Reservation
     {
-        public Reservation(DateTime date, BarName barName)
+        private Reservation(DateTime date, BarName barName)
         {
             BarName = barName;
             Date = date;
@@ -88,6 +75,24 @@ namespace LiveCoding.Services
 
         public DateTime Date { get; set; }
         public BarName BarName { get; set; }
+
+        public static Reservation? MakeReservation(List<Bar> bars, DateTime date, int numberOfDevsAvailable)
+        {
+            foreach (var bar in bars.OrderByDescending(b => b.IsFavorite))
+            {
+                if (bar.HasEnoughCapacity(numberOfDevsAvailable) && bar.IsOpen(date))
+                    return new Reservation(date, bar.BarName);
+            }
+
+            return null;
+        }
+    }
+
+    public record Bar(BarName BarName, int Capacity, DayOfWeek[] OpenDays, bool IsFavorite)
+    {
+        public bool HasEnoughCapacity(int numberOfDevsAvailable) => Capacity >= numberOfDevsAvailable;
+
+        public bool IsOpen(DateTime date) => OpenDays.Contains(date.DayOfWeek);
     }
 
     public record BarName(string Value);
