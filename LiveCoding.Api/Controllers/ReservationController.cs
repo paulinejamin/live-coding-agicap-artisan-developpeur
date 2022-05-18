@@ -16,7 +16,7 @@ namespace LiveCoding.Api.Controllers
         }
 
         [HttpGet]
-        public Tuple<DateTime?, BarData?> Get()
+        public Reservation? Get()
         {
             return reservationService.ReserveBar();
         }

@@ -38,8 +38,8 @@ namespace LiveCoding.Tests
 
             var result = endpoint.Get();
 
-            Check.That(result.Item1).IsEqualTo(thursday);
-            Check.That(result.Item2.Name).IsEqualTo(expectedBar);
+            Check.That(result.Date).IsEqualTo(thursday);
+            Check.That(result.BarName.Value).IsEqualTo(expectedBar);
         }
 
         [Fact]
@@ -71,8 +71,7 @@ namespace LiveCoding.Tests
 
             var result = endpoint.Get();
 
-            Check.That(result.Item1).IsEqualTo(null);
-            Check.That(result.Item2).IsEqualTo(null);
+            Check.That(result).IsEqualTo(null);
         }
 
         [Fact]
@@ -95,8 +94,8 @@ namespace LiveCoding.Tests
 
             var result = endpoint.Get();
 
-            Check.That(result.Item1).IsEqualTo(thursday);
-            Check.That(result.Item2.Name).IsEqualTo(expectedBar);
+            Check.That(result.Date).IsEqualTo(thursday);
+            Check.That(result.BarName.Value).IsEqualTo(expectedBar);
         }
 
         [Fact]
@@ -119,8 +118,7 @@ namespace LiveCoding.Tests
 
             var result = endpoint.Get();
 
-            Check.That(result.Item1).IsEqualTo(null);
-            Check.That(result.Item2).IsEqualTo(null);
+            Check.That(result).IsEqualTo(null);
         }
 
         [Fact]
@@ -149,8 +147,7 @@ namespace LiveCoding.Tests
 
             var result = endpoint.Get();
 
-            Check.That(result.Item1).IsEqualTo(null);
-            Check.That(result.Item2).IsEqualTo(null);
+            Check.That(result).IsEqualTo(null);
         }
 
         [Fact]
@@ -181,8 +178,8 @@ namespace LiveCoding.Tests
 
             var result = endpoint.Get();
 
-            Check.That(result.Item1).IsEqualTo(wednesday);
-            Check.That(result.Item2.Name).IsEqualTo(boatName);
+            Check.That(result.Date).IsEqualTo(wednesday);
+            Check.That(result.BarName.Value).IsEqualTo(boatName);
         }
 
         [Fact]

@@ -15,7 +15,7 @@ namespace LiveCoding.Services
             this.boatRepository = boatRepository;
         }
 
-        public Tuple<DateTime?, BarData?> ReserveBar()
+        public Reservation? ReserveBar()
         {
             var bars = barRepo.Get();
             var devs = devRepo.Get();
@@ -41,7 +41,7 @@ namespace LiveCoding.Services
 
             if (max <= devs.Count() * 0.6)
             {
-                return new Tuple<DateTime?, BarData?>(null, null);
+                return null;
             }
 
             var dateTime = dictionary.First(kv => kv.Value == max).Key;
@@ -50,12 +50,7 @@ namespace LiveCoding.Services
             foreach (var boatData in boats)
             {
                 BookBoat(boatData, dateTime);
-                BarData barBoat = new()
-                {
-                    Name = boatData.Name,
-                    Capacity = boatData.MaxPeople
-                };
-                return new Tuple<DateTime?, BarData?>(dateTime, barBoat);
+                return new Reservation(dateTime, new BarName(boatData.Name));
             }
 
             foreach (var barData in bars)
@@ -63,11 +58,11 @@ namespace LiveCoding.Services
                 if (barData.Capacity >= max && barData.Open.Contains(dateTime.DayOfWeek))
                 {
                     BookBar(barData, dateTime);
-                    return new Tuple<DateTime?, BarData?>(dateTime, barData);
+                    return new Reservation(dateTime, new BarName(barData.Name));
                 }
             }
 
-            return new Tuple<DateTime?, BarData?>(null, null);
+            return null;
         }
 
         private void BookBoat(BoatData boatData, DateTime dateTime)
@@ -82,4 +77,18 @@ namespace LiveCoding.Services
             Console.WriteLine("Bar booked: " + barData.Name + " at " + dateTime);
         }
     }
+
+    public class Reservation
+    {
+        public Reservation(DateTime date, BarName barName)
+        {
+            BarName = barName;
+            Date = date;
+        }
+
+        public DateTime Date { get; set; }
+        public BarName BarName { get; set; }
+    }
+
+    public record BarName(string Value);
 }
