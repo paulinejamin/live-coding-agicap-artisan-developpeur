@@ -6,17 +6,20 @@ namespace LiveCoding.Services
     {
         private readonly IBarRepository barRepo;
         private readonly IDevRepository devRepo;
+        private readonly FakeBoatRepository boatRepository;
 
-        public ReservationService(IBarRepository barRepo, IDevRepository devRepo)
+        public ReservationService(IBarRepository barRepo, IDevRepository devRepo, FakeBoatRepository boatRepository)
         {
             this.barRepo = barRepo;
             this.devRepo = devRepo;
+            this.boatRepository = boatRepository;
         }
 
         public Tuple<DateTime?, BarData?> ReserveBar()
         {
             var bars = barRepo.Get();
             var devs = devRepo.Get();
+            var boats = boatRepository.Get();
 
             Dictionary<DateTime, int> dictionary = new Dictionary<DateTime, int>();
             foreach (var devData in devs)
@@ -40,8 +43,20 @@ namespace LiveCoding.Services
             {
                 return new Tuple<DateTime?, BarData?>(null, null);
             }
-            
+
             var dateTime = dictionary.First(kv => kv.Value == max).Key;
+
+
+            foreach (var boatData in boats)
+            {
+                BookBoat(boatData, dateTime);
+                BarData barBoat = new()
+                {
+                    Name = boatData.Name,
+                    Capacity = boatData.MaxPeople
+                };
+                return new Tuple<DateTime?, BarData?>(dateTime, barBoat);
+            }
 
             foreach (var barData in bars)
             {
@@ -51,8 +66,14 @@ namespace LiveCoding.Services
                     return new Tuple<DateTime?, BarData?>(dateTime, barData);
                 }
             }
-            
+
             return new Tuple<DateTime?, BarData?>(null, null);
+        }
+
+        private void BookBoat(BoatData boatData, DateTime dateTime)
+        {
+            // TODO send an email ? 
+            Console.WriteLine("Boat booked: " + boatData.Name + " at " + dateTime);
         }
 
         private void BookBar(BarData barData, DateTime dateTime)
