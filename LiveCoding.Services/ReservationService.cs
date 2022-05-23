@@ -8,12 +8,14 @@ namespace LiveCoding.Services
         private readonly IBarRepository barRepo;
         private readonly IDevRepository devRepo;
         private readonly FakeBoatRepository boatRepository;
+        private readonly IReservationRepository reservationRepository;
 
-        public ReservationService(IBarRepository barRepo, IDevRepository devRepo, FakeBoatRepository boatRepository)
+        public ReservationService(IBarRepository barRepo, IDevRepository devRepo, FakeBoatRepository boatRepository, IReservationRepository reservationRepository)
         {
             this.barRepo = barRepo;
             this.devRepo = devRepo;
             this.boatRepository = boatRepository;
+            this.reservationRepository = reservationRepository;
         }
 
         public Reservation ReserveBar()
@@ -30,9 +32,14 @@ namespace LiveCoding.Services
                 .Concat(GetBoats(boats))
                 .ToList();
 
-            return Reservation.MakeReservation(allBars, bestDate.Date, bestDate.NumberOfDevsAvailable);
+            var reservation = Reservation.MakeReservation(allBars, bestDate.Date, bestDate.NumberOfDevsAvailable);
+            if (reservation == Reservation.Impossible)
+                return Reservation.Impossible;
+
+            reservationRepository.Save(reservation);
+            return reservation;
         }
-        
+
 
         private static IEnumerable<Bar> GetBoats(IEnumerable<BoatData> boats) 
             => boats
@@ -41,5 +48,12 @@ namespace LiveCoding.Services
         private static IEnumerable<Bar> GetIndoorBars(IEnumerable<BarData> indoorBars) =>
             indoorBars
                 .Select(bar => new Bar(new BarName(bar.Name), bar.Capacity, bar.Open, false));
+
+        public void Cancel(DateTime date)
+        {
+            var reservation = reservationRepository.GetUpcomingReservations(date);
+            reservation.Cancel();
+            reservationRepository.Save(reservation);
+        }
     }
 }

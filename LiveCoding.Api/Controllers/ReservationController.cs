@@ -1,5 +1,4 @@
 using LiveCoding.Domain;
-using LiveCoding.Persistence;
 using LiveCoding.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,17 +9,37 @@ namespace LiveCoding.Api.Controllers
     public class ReservationController : ControllerBase
     {
         private readonly ReservationService reservationService;
+        private IReservationQueryRepository reservationRepository;
 
-        public ReservationController(ReservationService reservationService)
+        public ReservationController(ReservationService reservationService, IReservationQueryRepository reservationRepository)
         {
             this.reservationService = reservationService;
+            this.reservationRepository = reservationRepository;
         }
 
-        [HttpGet]
-        public Reservation? Get()
+        [HttpPut]
+        public Reservation? MakeReservation()
         {
             var reservation = reservationService.ReserveBar();
             return reservation == Reservation.Impossible ? null : reservation;
         }
+
+        [HttpGet]
+        public IEnumerable<Reservation> Get()
+        {
+            return reservationRepository.GetUpcomingReservations();
+        }
+
+
+        [HttpPost]
+        public void Cancel(DateTime date)
+        {
+            reservationService.Cancel(date);
+        }
+    }
+
+    public interface IReservationQueryRepository
+    {
+        IEnumerable<Reservation> GetUpcomingReservations();
     }
 }

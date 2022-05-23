@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using LiveCoding.Api.Controllers;
 using LiveCoding.Persistence;
 using LiveCoding.Services;
@@ -32,14 +33,15 @@ namespace LiveCoding.Tests
                 new DevData() { Name = "Bob 4", OnSite = new DateTime[] { wednesday, thursday } },
                 new DevData() { Name = "Bob 5", OnSite = new DateTime[] { thursday } },
             };
+            var reservationRepository = new InMemoryReservationRepository();
             var endpoint =
                 new ReservationController(new ReservationService(new FakeBarRepository(barData),
-                    new FakeDevRepository(devData), new FakeBoatRepository(null)));
+                    new FakeDevRepository(devData), new FakeBoatRepository(null), reservationRepository), reservationRepository);
 
-            var result = endpoint.Get();
+            var result = endpoint.MakeReservation();
 
             Check.That(result.Date).IsEqualTo(thursday);
-            Check.That(result.BarName.Value).IsEqualTo(expectedBar);
+            Check.That(result.Bar.Name.Value).IsEqualTo(expectedBar);
         }
 
         [Fact]
@@ -65,11 +67,12 @@ namespace LiveCoding.Tests
                 new DevData() { Name = "Bob 4", OnSite = new DateTime[] { wednesday } },
                 new DevData() { Name = "Bob 5", OnSite = new DateTime[] { thursday } },
             };
+            var reservationRepository = new InMemoryReservationRepository();
             var endpoint =
                 new ReservationController(new ReservationService(new FakeBarRepository(barData),
-                    new FakeDevRepository(devData), new FakeBoatRepository(null)));
+                    new FakeDevRepository(devData), new FakeBoatRepository(null), reservationRepository), reservationRepository);
 
-            var result = endpoint.Get();
+            var result = endpoint.MakeReservation();
 
             Check.That(result).IsEqualTo(null);
         }
@@ -89,13 +92,14 @@ namespace LiveCoding.Tests
                 new DevData() { Name = "Bob", OnSite = new DateTime[] { thursday } },
                 new DevData() { Name = "Alice", OnSite = new DateTime[] { thursday } }
             };
+            var reservationRepository = new InMemoryReservationRepository();
             var endpoint = new ReservationController(new ReservationService(new FakeBarRepository(barData),
-                new FakeDevRepository(devData), new FakeBoatRepository(null)));
+                new FakeDevRepository(devData), new FakeBoatRepository(null), reservationRepository), reservationRepository);
 
-            var result = endpoint.Get();
+            var result = endpoint.MakeReservation();
 
             Check.That(result.Date).IsEqualTo(thursday);
-            Check.That(result.BarName.Value).IsEqualTo(expectedBar);
+            Check.That(result.Bar.Name.Value).IsEqualTo(expectedBar);
         }
 
         [Fact]
@@ -113,10 +117,11 @@ namespace LiveCoding.Tests
                 new DevData() { Name = "Bob", OnSite = new DateTime[] { wednesday } },
                 new DevData() { Name = "Alice", OnSite = new DateTime[] { wednesday } }
             };
+            var reservationRepository = new InMemoryReservationRepository();
             var endpoint = new ReservationController(new ReservationService(new FakeBarRepository(barData),
-                new FakeDevRepository(devData), new FakeBoatRepository(null)));
+                new FakeDevRepository(devData), new FakeBoatRepository(null), reservationRepository), reservationRepository);
 
-            var result = endpoint.Get();
+            var result = endpoint.MakeReservation();
 
             Check.That(result).IsEqualTo(null);
         }
@@ -142,10 +147,11 @@ namespace LiveCoding.Tests
                 new DevData() { Name = "Bob 3", OnSite = new DateTime[] { wednesday } },
                 new DevData() { Name = "Bob 4", OnSite = new DateTime[] { wednesday } },
             };
+            var reservationRepository = new InMemoryReservationRepository();
             var endpoint = new ReservationController(new ReservationService(new FakeBarRepository(barData),
-                new FakeDevRepository(devData), new FakeBoatRepository(null)));
+                new FakeDevRepository(devData), new FakeBoatRepository(null), reservationRepository), reservationRepository);
 
-            var result = endpoint.Get();
+            var result = endpoint.MakeReservation();
 
             Check.That(result).IsEqualTo(null);
         }
@@ -173,13 +179,14 @@ namespace LiveCoding.Tests
                 new BoatData()
                     { MaxPeople = 3, Name = boatName, OpenFrom = wednesday, OpenUntil = wednesday.AddDays(4) }
             };
+            var reservationRepository = new InMemoryReservationRepository();
             var endpoint = new ReservationController(new ReservationService(new FakeBarRepository(barData),
-                new FakeDevRepository(devData), new FakeBoatRepository(boatData)));
+                new FakeDevRepository(devData), new FakeBoatRepository(boatData), reservationRepository), reservationRepository);
 
-            var result = endpoint.Get();
+            var result = endpoint.MakeReservation();
 
             Check.That(result.Date).IsEqualTo(wednesday);
-            Check.That(result.BarName.Value).IsEqualTo(boatName);
+            Check.That(result.Bar.Name.Value).IsEqualTo(boatName);
         }
 
         [Fact]
@@ -193,6 +200,45 @@ namespace LiveCoding.Tests
         public void Do_not_reserve_boat_when_Agicap_devs_fill_more_than_80_percent()
         {
         }
+
+        [Fact]
+        public void Cancel_reservation()
+        {
+            var someBarData = new BarData[]
+            {
+                new BarData()
+                {
+                    Capacity = 3, Food = false, Name = "my bar",
+                    Open = new[] { DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday }
+                }
+            };
+            var wednesday = new DateTime(2022, 05, 11);
+            var devData = new DevData[]
+            {
+                new DevData() { Name = "Bob 1", OnSite = new DateTime[] { wednesday } },
+                new DevData() { Name = "Bob 2", OnSite = new DateTime[] { wednesday } },
+            };
+            string boatName = "boaaaat";
+            var boatData = new BoatData[]
+            {
+                new BoatData()
+                    { MaxPeople = 3, Name = boatName, OpenFrom = wednesday, OpenUntil = wednesday.AddDays(4) }
+            };
+            var reservationRepository = new InMemoryReservationRepository();
+            var endpoint = new ReservationController(new ReservationService(new FakeBarRepository(someBarData),
+                new FakeDevRepository(devData), new FakeBoatRepository(boatData), reservationRepository), reservationRepository);
+
+            var reservation = endpoint.MakeReservation();
+            var cancelledDate = reservation.Date;
+
+
+            endpoint.Cancel(cancelledDate);
+
+            var result = endpoint.Get();
+
+            Check.That(result).ContainsOnlyElementsThatMatch(r => r.Date != cancelledDate);
+        }
+
 
 
     }

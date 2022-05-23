@@ -2,16 +2,18 @@
 
 public class Reservation
 {
-    private Reservation(DateTime date, BarName barName)
+    private Reservation(DateTime date, Bar bar)
     {
-        BarName = barName;
+        Bar = bar;
         Date = date;
     }
 
     public DateTime Date { get; set; }
-    public BarName BarName { get; set; }
+    public Bar Bar { get; set; }
 
-    public static Reservation Impossible = new Reservation(DateTime.MinValue, new BarName(string.Empty));
+    public static Reservation Impossible = new Reservation(DateTime.MinValue, Bar.None);
+
+    public bool IsCancelled { get; set; }
 
     public static Reservation MakeReservation(List<Bar> bars, DateTime date, int numberOfDevsAvailable)
     {
@@ -20,9 +22,15 @@ public class Reservation
             if (bar.HasEnoughCapacity(numberOfDevsAvailable) && bar.IsOpen(date))
             {
                 bar.BookBar(date);
-                return new Reservation(date, bar.Name);
+                return new Reservation(date, bar);
             }
         }
         return Reservation.Impossible;
+    }
+
+    public void Cancel()
+    {
+        this.Bar.SendCancellation(this.Date);
+        IsCancelled = true;
     }
 }
