@@ -1,8 +1,6 @@
-﻿using LiveCoding.Persistence;
+﻿namespace LiveCoding.Domain;
 
-namespace LiveCoding.Services;
-
-internal record BestDate
+public record BestDate
 {
     public static BestDate NotFound = new(DateTime.MinValue, 0);
     private const double MinimumPercentageOfDevs = 0.6;
@@ -15,27 +13,24 @@ internal record BestDate
         NumberOfDevsAvailable = numberOfDevsAvailable;
     }
 
-    public static BestDate GetBestDate(IEnumerable<DevData> devs)
+    public static BestDate GetBestDate(int numberOfDevs, IEnumerable<DateTime> allDates)
     {
         var availabilities = new Dictionary<DateTime, int>();
-        foreach (var devData in devs)
+        foreach (var date in allDates)
         {
-            foreach (var date in devData.OnSite)
+            if (availabilities.ContainsKey(date))
             {
-                if (availabilities.ContainsKey(date))
-                {
-                    availabilities[date]++;
-                }
-                else
-                {
-                    availabilities.Add(date, 1);
-                }
+                availabilities[date]++;
+            }
+            else
+            {
+                availabilities.Add(date, 1);
             }
         }
 
         var maxNumberOfDevsAvailable = availabilities.Values.Max();
 
-        if (maxNumberOfDevsAvailable <= devs.Count() * MinimumPercentageOfDevs)
+        if (maxNumberOfDevsAvailable <= numberOfDevs * MinimumPercentageOfDevs)
         {
             return BestDate.NotFound;
         }

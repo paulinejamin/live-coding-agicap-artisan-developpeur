@@ -6,9 +6,4 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\LiveCoding.Domain\LiveCoding.Domain.csproj" />
-    <ProjectReference Include="..\LiveCoding.Persistence\LiveCoding.Persistence.csproj" />
-  </ItemGroup>
-
 </Project>

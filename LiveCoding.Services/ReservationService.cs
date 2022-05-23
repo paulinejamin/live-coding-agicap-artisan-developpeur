@@ -1,4 +1,5 @@
-﻿using LiveCoding.Persistence;
+﻿using LiveCoding.Domain;
+using LiveCoding.Persistence;
 
 namespace LiveCoding.Services
 {
@@ -21,7 +22,7 @@ namespace LiveCoding.Services
             var boats = boatRepository.Get();
 
             var devs = devRepo.Get();
-            var bestDate = BestDate.GetBestDate(devs);
+            var bestDate = BestDate.GetBestDate(devs.Count(),devs.SelectMany(d=>d.OnSite));
             if (bestDate == BestDate.NotFound)
                 return Reservation.Impossible;
 

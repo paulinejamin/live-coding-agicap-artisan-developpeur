@@ -1,3 +1,3 @@
-﻿namespace LiveCoding.Services;
+﻿namespace LiveCoding.Domain;
 
 public record BarName(string Value);
