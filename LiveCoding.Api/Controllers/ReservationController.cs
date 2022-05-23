@@ -18,7 +18,8 @@ namespace LiveCoding.Api.Controllers
         [HttpGet]
         public Reservation? Get()
         {
-            return reservationService.ReserveBar();
+            var reservation = reservationService.ReserveBar();
+            return reservation == Reservation.Impossible ? null : reservation;
         }
     }
 }

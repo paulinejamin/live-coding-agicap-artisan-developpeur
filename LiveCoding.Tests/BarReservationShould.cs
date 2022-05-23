@@ -188,7 +188,7 @@ namespace LiveCoding.Tests
         }
 
 
-        // TODO CHOOSE : this test or third bar type ???
+        // TODO CHOOSE : this test or third bar type ???   ====> indoor / terraces / boats
         [Fact]
         public void Do_not_reserve_boat_when_Agicap_devs_fill_more_than_80_percent()
         {
