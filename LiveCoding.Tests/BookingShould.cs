@@ -50,13 +50,11 @@ namespace LiveCoding.Tests
                 new DevData { Name = "Dan", OnSite = new[] { Wednesday } },
                 new DevData { Name = "Eve", OnSite = new[] { Thursday } },
             };
-
             var controller = BuildController(barData, devData);
 
-            controller.MakeBooking();
-
-            var result = controller.Get();
-            Check.That(result).IsEmpty();
+            var success = controller.MakeBooking();
+            
+            Check.That(success).IsFalse();
         }
 
         [Fact]
@@ -97,14 +95,11 @@ namespace LiveCoding.Tests
                 new DevData { Name = "Bob", OnSite = new[] { Wednesday } },
                 new DevData { Name = "Alice", OnSite = new[] { Wednesday } }
             };
-
             var controller = BuildController(barData, devData);
+            
+            var success = controller.MakeBooking();
 
-            controller.MakeBooking();
-
-            var result = controller.Get();
-
-            Check.That(result).IsEmpty();
+            Check.That(success).IsFalse();
         }
 
         [Fact]
@@ -121,14 +116,11 @@ namespace LiveCoding.Tests
                 new DevData { Name = "Dan", OnSite = new[] { Wednesday } },
                 new DevData { Name = "Eve", OnSite = new[] { Wednesday } },
             };
-
             var controller = BuildController(barData, devData);
 
-            controller.MakeBooking();
+            var success = controller.MakeBooking();
 
-            var result = controller.Get();
-
-            Check.That(result).IsEmpty();
+            Check.That(success).IsFalse();
         }
 
         private static BookingController BuildController(BarData[] barData, DevData[] devData)

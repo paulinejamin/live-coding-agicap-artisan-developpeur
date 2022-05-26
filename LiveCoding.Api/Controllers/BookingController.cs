@@ -18,9 +18,9 @@ namespace LiveCoding.Api.Controllers
         }
         
         [HttpPut]
-        public void MakeBooking()
+        public bool MakeBooking()
         {
-            bookingService.ReserveBar();
+            return bookingService.ReserveBar();
         }
 
         [HttpGet]
