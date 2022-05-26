@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using LiveCoding.Api.Controllers;
 using LiveCoding.Persistence;
 using LiveCoding.Services;
@@ -7,7 +8,7 @@ using Xunit;
 
 namespace LiveCoding.Tests
 {
-    public class ReservationShould
+    public class BookingShould
     {
         [Fact]
         public void Reserve_bar_when_at_least_60_percent_of_devs_are_available()
@@ -25,14 +26,13 @@ namespace LiveCoding.Tests
                 new DevData { Name = "Dan", OnSite = new[] { Wednesday, Thursday } },
                 new DevData { Name = "Eve", OnSite = new[] { Thursday } },
             };
-            var endpoint =
-                new ReservationController(new ReservationService(new FakeBarRepository(barData),
-                    new FakeDevRepository(devData)));
+            var endpoint = BuildController(barData, devData);
 
-            var result = endpoint.Get();
+            endpoint.MakeBooking();
 
-            Check.That(result.Item1).IsEqualTo(Thursday);
-            Check.That(result.Item2.Name).IsEqualTo(expectedBar);
+            var result = endpoint.Get().Single();
+            Check.That(result.Date).IsEqualTo(Thursday);
+            Check.That(result.Bar.Name).IsEqualTo(expectedBar);
         }
 
         [Fact]
@@ -50,14 +50,13 @@ namespace LiveCoding.Tests
                 new DevData { Name = "Dan", OnSite = new[] { Wednesday } },
                 new DevData { Name = "Eve", OnSite = new[] { Thursday } },
             };
-            var endpoint =
-                new ReservationController(new ReservationService(new FakeBarRepository(barData),
-                    new FakeDevRepository(devData)));
+
+            var endpoint = BuildController(barData, devData);
+
+            endpoint.MakeBooking();
 
             var result = endpoint.Get();
-
-            Check.That(result.Item1).IsEqualTo(null);
-            Check.That(result.Item2).IsEqualTo(null);
+            Check.That(result).IsEmpty();
         }
 
         [Fact]
@@ -74,13 +73,15 @@ namespace LiveCoding.Tests
                 new DevData { Name = "Bob", OnSite = new[] { Thursday } },
                 new DevData { Name = "Alice", OnSite = new[] { Thursday } }
             };
-            var endpoint = new ReservationController(new ReservationService(new FakeBarRepository(barData),
-                    new FakeDevRepository(devData)));
 
-            var result = endpoint.Get();
+            var endpoint = BuildController(barData, devData);
 
-            Check.That(result.Item1).IsEqualTo(Thursday);
-            Check.That(result.Item2.Name).IsEqualTo(expectedBar);
+            endpoint.MakeBooking();
+
+            var result = endpoint.Get().Single();
+
+            Check.That(result.Date).IsEqualTo(Thursday);
+            Check.That(result.Bar.Name).IsEqualTo(expectedBar);
         }
 
         [Fact]
@@ -96,13 +97,14 @@ namespace LiveCoding.Tests
                 new DevData { Name = "Bob", OnSite = new[] { Wednesday } },
                 new DevData { Name = "Alice", OnSite = new[] { Wednesday } }
             };
-            var endpoint = new ReservationController(new ReservationService(new FakeBarRepository(barData),
-                new FakeDevRepository(devData)));
+
+            var endpoint = BuildController(barData, devData);
+
+            endpoint.MakeBooking();
 
             var result = endpoint.Get();
 
-            Check.That(result.Item1).IsEqualTo(null);
-            Check.That(result.Item2).IsEqualTo(null);
+            Check.That(result).IsEmpty();
         }
 
         [Fact]
@@ -119,15 +121,23 @@ namespace LiveCoding.Tests
                 new DevData { Name = "Dan", OnSite = new[] { Wednesday } },
                 new DevData { Name = "Eve", OnSite = new[] { Wednesday } },
             };
-            var endpoint = new ReservationController(new ReservationService(new FakeBarRepository(barData),
-                    new FakeDevRepository(devData)));
+
+            var endpoint = BuildController(barData, devData);
+
+            endpoint.MakeBooking();
 
             var result = endpoint.Get();
 
-            Check.That(result.Item1).IsEqualTo(null);
-            Check.That(result.Item2).IsEqualTo(null);
+            Check.That(result).IsEmpty();
         }
-        
+
+        private static BookingController BuildController(BarData[] barData, DevData[] devData)
+        {
+            var bookingRepository = new FakeBookingRepository();
+            return new BookingController(new BookingService(new FakeBarRepository(barData),
+                new FakeDevRepository(devData), bookingRepository), bookingRepository);
+        }
+
         private static BarData ABar() => new()
         {
             Name = "Wallace", Capacity = 10, Food = false,

@@ -10,7 +10,7 @@ namespace LiveCoding.Api
             return services
                 .AddScoped<IBarRepository, BarRepository>()
                 .AddScoped<IDevRepository, DevRepository>()
-                .AddScoped<ReservationService>();
+                .AddScoped<BookingService>();
         }
     }
 }

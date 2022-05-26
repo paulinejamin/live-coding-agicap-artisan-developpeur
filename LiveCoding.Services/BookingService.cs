@@ -2,23 +2,25 @@
 
 namespace LiveCoding.Services
 {
-    public class ReservationService
+    public class BookingService
     {
         private readonly IBarRepository barRepo;
         private readonly IDevRepository devRepo;
+        private readonly IBookingRepository bookingRepository;
 
-        public ReservationService(IBarRepository barRepo, IDevRepository devRepo)
+        public BookingService(IBarRepository barRepo, IDevRepository devRepo, IBookingRepository bookingRepository)
         {
             this.barRepo = barRepo;
             this.devRepo = devRepo;
+            this.bookingRepository = bookingRepository;
         }
 
-        public Tuple<DateTime?, BarData?> ReserveBar()
+        public bool ReserveBar()
         {
             var bars = barRepo.Get();
             var devs = devRepo.Get();
 
-            Dictionary<DateTime, int> dictionary = new Dictionary<DateTime, int>();
+            var dictionary = new Dictionary<DateTime, int>();
             foreach (var devData in devs)
             {
                 foreach (var date in devData.OnSite)
@@ -38,7 +40,7 @@ namespace LiveCoding.Services
 
             if (max <= devs.Count() * 0.6)
             {
-                return new Tuple<DateTime?, BarData?>(null, null);
+                return false;
             }
             
             var dateTime = dictionary.First(kv => kv.Value == max).Key;
@@ -48,17 +50,31 @@ namespace LiveCoding.Services
                 if (barData.Capacity >= max && barData.Open.Contains(dateTime.DayOfWeek))
                 {
                     BookBar(barData, dateTime);
-                    return new Tuple<DateTime?, BarData?>(dateTime, barData);
+                    bookingRepository.Save(new BookingData(){Bar = barData, Date = dateTime});
+                    return true;
                 }
             }
             
-            return new Tuple<DateTime?, BarData?>(null, null);
+            return false;
         }
 
         private void BookBar(BarData barData, DateTime dateTime)
         {
-            // TODO send an email ? 
             Console.WriteLine("Bar booked: " + barData.Name + " at " + dateTime);
         }
+
+        public void Cancel(DateTime date)
+        {
+            var booking = bookingRepository.GetUpcomingBooking(date);
+            this.SendBarCancellation(booking.Bar, booking.Date);
+            booking.IsCancelled = true;
+            bookingRepository.Save(booking);
+        }
+
+        private void SendBarCancellation(BarData bar, DateTime? date)
+        {
+            Console.WriteLine("Bar booking cancelled: " + bar + " at " + date);
+        }
+
     }
 }
