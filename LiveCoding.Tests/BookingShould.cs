@@ -13,7 +13,7 @@ namespace LiveCoding.Tests
         [Fact]
         public void Reserve_bar_when_at_least_60_percent_of_devs_are_available()
         {
-            var expectedBar = "La belle équipe";
+            var expectedBar = "La belle Ã©quipe";
             var barData = new[]
             {
                 ABar() with { Name = expectedBar, Open = new[] { DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday } }
@@ -26,11 +26,11 @@ namespace LiveCoding.Tests
                 new DevData { Name = "Dan", OnSite = new[] { Wednesday, Thursday } },
                 new DevData { Name = "Eve", OnSite = new[] { Thursday } },
             };
-            var endpoint = BuildController(barData, devData);
+            var controller = BuildController(barData, devData);
 
-            endpoint.MakeBooking();
+            controller.MakeBooking();
 
-            var result = endpoint.Get().Single();
+            var result = controller.Get().Single();
             Check.That(result.Date).IsEqualTo(Thursday);
             Check.That(result.Bar.Name).IsEqualTo(expectedBar);
         }
@@ -51,18 +51,18 @@ namespace LiveCoding.Tests
                 new DevData { Name = "Eve", OnSite = new[] { Thursday } },
             };
 
-            var endpoint = BuildController(barData, devData);
+            var controller = BuildController(barData, devData);
 
-            endpoint.MakeBooking();
+            controller.MakeBooking();
 
-            var result = endpoint.Get();
+            var result = controller.Get();
             Check.That(result).IsEmpty();
         }
 
         [Fact]
         public void Reserve_bar_when_it_is_open()
         {
-            var expectedBar = "La belle équipe";
+            var expectedBar = "La belle Ã©quipe";
             var barData = new[]
             {
                 ABar() with { Name = expectedBar, Open = new[] { DayOfWeek.Thursday } },
@@ -74,11 +74,11 @@ namespace LiveCoding.Tests
                 new DevData { Name = "Alice", OnSite = new[] { Thursday } }
             };
 
-            var endpoint = BuildController(barData, devData);
+            var controller = BuildController(barData, devData);
 
-            endpoint.MakeBooking();
+            controller.MakeBooking();
 
-            var result = endpoint.Get().Single();
+            var result = controller.Get().Single();
 
             Check.That(result.Date).IsEqualTo(Thursday);
             Check.That(result.Bar.Name).IsEqualTo(expectedBar);
@@ -89,7 +89,7 @@ namespace LiveCoding.Tests
         {
             var barData = new[]
             {
-                ABar() with { Name = "La belle équipe", Open = new[] { DayOfWeek.Thursday } },
+                ABar() with { Name = "La belle Ã©quipe", Open = new[] { DayOfWeek.Thursday } },
                 ABar() with { Name = "Le Sirius", Open = new[] { DayOfWeek.Friday } }
             };
             var devData = new[]
@@ -98,11 +98,11 @@ namespace LiveCoding.Tests
                 new DevData { Name = "Alice", OnSite = new[] { Wednesday } }
             };
 
-            var endpoint = BuildController(barData, devData);
+            var controller = BuildController(barData, devData);
 
-            endpoint.MakeBooking();
+            controller.MakeBooking();
 
-            var result = endpoint.Get();
+            var result = controller.Get();
 
             Check.That(result).IsEmpty();
         }
@@ -122,11 +122,11 @@ namespace LiveCoding.Tests
                 new DevData { Name = "Eve", OnSite = new[] { Wednesday } },
             };
 
-            var endpoint = BuildController(barData, devData);
+            var controller = BuildController(barData, devData);
 
-            endpoint.MakeBooking();
+            controller.MakeBooking();
 
-            var result = endpoint.Get();
+            var result = controller.Get();
 
             Check.That(result).IsEmpty();
         }
