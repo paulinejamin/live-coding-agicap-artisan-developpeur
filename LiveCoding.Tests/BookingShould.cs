@@ -16,7 +16,10 @@ namespace LiveCoding.Tests
             var expectedBar = "La belle équipe";
             var barData = new[]
             {
-                ABar() with { Name = expectedBar, Open = new[] { DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday } }
+                ABar() with
+                {
+                    Name = expectedBar, Open = new[] { DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday }
+                }
             };
             var devData = new[]
             {
@@ -53,7 +56,7 @@ namespace LiveCoding.Tests
             var controller = BuildController(barData, devData);
 
             var success = controller.MakeBooking();
-            
+
             Check.That(success).IsFalse();
         }
 
@@ -96,7 +99,7 @@ namespace LiveCoding.Tests
                 new DevData { Name = "Alice", OnSite = new[] { Wednesday } }
             };
             var controller = BuildController(barData, devData);
-            
+
             var success = controller.MakeBooking();
 
             Check.That(success).IsFalse();
@@ -123,11 +126,36 @@ namespace LiveCoding.Tests
             Check.That(success).IsFalse();
         }
 
-        private static BookingController BuildController(BarData[] barData, DevData[] devData)
+        [Fact]
+        public void Choose_boat_over_bar_when_available()
+        {
+            var barData = new[] { ABar() with { Open = new[] { DayOfWeek.Wednesday } } };
+            var devData = new DevData[]
+            {
+                new() { Name = "Bob", OnSite = new[] { Wednesday } },
+                new() { Name = "Alice", OnSite = new[] { Wednesday } },
+            };
+            var boatName = "Ayers Rock";
+            var boatData = new BoatData[]
+                { new() { MaxPeople = 3, Name = boatName, OpenFrom = Wednesday, OpenUntil = Wednesday.AddDays(4) } };
+            var endpoint = BuildController(barData, devData, boatData);
+            endpoint.MakeBooking();
+            var booking = endpoint.Get().Single();
+            Check.That(booking.Date).IsEqualTo(Wednesday);
+            Check.That(booking.Bar.Name).IsEqualTo(boatName);
+        }
+
+        private static BookingController BuildController(BarData[] barData, 
+            DevData[] devData,
+            BoatData[]? boatData = null)
         {
             var bookingRepository = new FakeBookingRepository();
-            return new BookingController(new BookingService(new FakeBarRepository(barData),
-                new FakeDevRepository(devData), bookingRepository), bookingRepository);
+            return new BookingController(new BookingService(
+                    new FakeBarRepository(barData),
+                    new FakeDevRepository(devData),
+                    new FakeBoatRepository(boatData ?? Array.Empty<BoatData>()),
+                    bookingRepository),
+                bookingRepository);
         }
 
         private static BarData ABar() => new()
@@ -140,6 +168,5 @@ namespace LiveCoding.Tests
         private static readonly DateTime Wednesday = new(2022, 05, 11);
         private static readonly DateTime Thursday = Wednesday.AddDays(1);
         private static readonly DateTime Friday = Wednesday.AddDays(2);
-
     }
 }

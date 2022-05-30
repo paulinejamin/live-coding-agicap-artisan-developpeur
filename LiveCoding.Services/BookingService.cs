@@ -6,12 +6,17 @@ namespace LiveCoding.Services
     {
         private readonly IBarRepository barRepo;
         private readonly IDevRepository devRepo;
+        private readonly IBoatRepository boatRepo;
         private readonly IBookingRepository bookingRepository;
 
-        public BookingService(IBarRepository barRepo, IDevRepository devRepo, IBookingRepository bookingRepository)
+        public BookingService(IBarRepository barRepo,
+            IDevRepository devRepo,
+            IBoatRepository boatRepo,
+            IBookingRepository bookingRepository)
         {
             this.barRepo = barRepo;
             this.devRepo = devRepo;
+            this.boatRepo = boatRepo;
             this.bookingRepository = bookingRepository;
         }
 
@@ -42,7 +47,7 @@ namespace LiveCoding.Services
             {
                 return false;
             }
-            
+
             var dateTime = dictionary.First(kv => kv.Value == max).Key;
 
             foreach (var barData in bars)
@@ -50,11 +55,11 @@ namespace LiveCoding.Services
                 if (barData.Capacity >= max && barData.Open.Contains(dateTime.DayOfWeek))
                 {
                     BookBar(barData, dateTime);
-                    bookingRepository.Save(new BookingData(){Bar = barData, Date = dateTime});
+                    bookingRepository.Save(new BookingData() { Bar = barData, Date = dateTime });
                     return true;
                 }
             }
-            
+
             return false;
         }
 
@@ -75,6 +80,5 @@ namespace LiveCoding.Services
         {
             Console.WriteLine("Bar booking cancelled: " + bar + " at " + date);
         }
-
     }
 }
