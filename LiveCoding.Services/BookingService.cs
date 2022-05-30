@@ -6,14 +6,18 @@ namespace LiveCoding.Services
     {
         private readonly IBarRepository _barRepo;
         private readonly IDevRepository _devRepo;
+        private readonly IBoatRepository _boatRepo;
         private readonly IBookingRepository _bookingRepository;
 
         public BookingService(IBarRepository barRepo,
             IDevRepository devRepo,
-            IBookingRepository bookingRepository)
+            IBoatRepository boatRepo,
+            IBookingRepository bookingRepository
+        )
         {
             _barRepo = barRepo;
             _devRepo = devRepo;
+            _boatRepo = boatRepo;
             _bookingRepository = bookingRepository;
         }
 

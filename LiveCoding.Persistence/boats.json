@@ -1,0 +1,16 @@
+{
+  "boats": [
+    {
+      "name": "Péniche Le Sirius",
+      "maxPeople": 60
+    },
+    {
+      "name": "Péniche Star Ferry",
+      "maxPeople": 100
+    },
+    {
+      "name": "Péniche Ayers Rock",
+      "maxPeople": 100
+    }
+  ]
+}

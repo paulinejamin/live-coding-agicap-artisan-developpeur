@@ -124,11 +124,36 @@ namespace LiveCoding.Tests
             Check.That(success).IsFalse();
         }
 
-        private static BookingController BuildController(BarData[] barData, DevData[] devData)
+        [Fact(Skip = "Not implemented yet")]
+        public void Choose_boat_over_bar_when_available()
+        {
+            var barData = new[] { ABar() with { Open = new[] { DayOfWeek.Wednesday } } };
+            var devData = new DevData[]
+            {
+                new() { Name = "Bob", OnSite = new[] { Wednesday } },
+                new() { Name = "Alice", OnSite = new[] { Wednesday } },
+            };
+            var boatName = "Péniche Ayers Rock";
+            var boatData = new BoatData[]
+                { new() { MaxPeople = 3, Name = boatName } };
+            var endpoint = BuildController(barData, devData, boatData);
+            endpoint.MakeBooking();
+            var booking = endpoint.Get().Single();
+            Check.That(booking.Date).IsEqualTo(Wednesday);
+            Check.That(booking.Bar.Name).IsEqualTo(boatName);
+        }
+
+        private static BookingController BuildController(BarData[] barData,
+            DevData[] devData,
+            BoatData[]? boatData = null)
         {
             var bookingRepository = new FakeBookingRepository();
-            return new BookingController(new BookingService(new FakeBarRepository(barData),
-                new FakeDevRepository(devData), bookingRepository), bookingRepository);
+            return new BookingController(new BookingService(
+                    new FakeBarRepository(barData),
+                    new FakeDevRepository(devData),
+                    new FakeBoatRepository(boatData ?? Array.Empty<BoatData>()),
+                    bookingRepository),
+                bookingRepository);
         }
 
         private static BarData ABar() => new(
