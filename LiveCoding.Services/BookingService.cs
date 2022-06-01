@@ -25,48 +25,52 @@ namespace LiveCoding.Services
         {
             var bars = _barRepo.Get();
             var devs = _devRepo.Get().ToList();
+            var boats = _boatRepo.Get();
 
-            var numberOfAvailableDevsByDate = new Dictionary<DateTime, int>();
-            foreach (var devData in devs)
+            var allBars = GetAllBars(bars, boats);
+            var availabilities = GetAvailabilities(devs);
+
+            var bestDate = BestDate.Get(availabilities, devs.Count);
+            var booking = Booking.Make(bestDate, allBars);
+
+            if (booking is not BookingNotFound)
             {
-                foreach (var date in devData.OnSite)
+                _bookingRepository.Save(new BookingData()
                 {
-                    if (numberOfAvailableDevsByDate.ContainsKey(date))
-                    {
-                        numberOfAvailableDevsByDate[date]++;
-                    }
-                    else
-                    {
-                        numberOfAvailableDevsByDate.Add(date, 1);
-                    }
-                }
-            }
-
-            var maxNumberOfDevs = numberOfAvailableDevsByDate.Values.Max();
-
-            if (maxNumberOfDevs <= devs.Count() * 0.6)
-            {
-                return false;
-            }
-
-            var bestDate = numberOfAvailableDevsByDate.First(kv => kv.Value == maxNumberOfDevs).Key;
-
-            foreach (var barData in bars)
-            {
-                if (barData.Capacity >= maxNumberOfDevs && barData.Open.Contains(bestDate.DayOfWeek))
-                {
-                    BookBar(barData.Name, bestDate);
-                    _bookingRepository.Save(new BookingData() { Bar = barData, Date = bestDate });
-                    return true;
-                }
+                    Bar = new BarData(booking.Bar.Name, booking.Bar.Capacity, booking.Bar.OpenDays),
+                    Date = booking.Date
+                });
+                return true;
             }
 
             return false;
         }
 
-        private void BookBar(string name, DateTime dateTime)
+        private static IEnumerable<Bar> GetAllBars(IEnumerable<BarData> bars, IEnumerable<BoatData> boats)
         {
-            Console.WriteLine("Bar booked: " + name + " at " + dateTime);
+            IEnumerable<Bar> allBars = bars.Select(b => new Bar(b.Name, b.Capacity, b.Open, false))
+                .Concat(boats.Select(b => new Bar(b.Name, b.MaxPeople, Enum.GetValues<DayOfWeek>(), true)));
+            return allBars;
+        }
+
+        private List<DevAvailability> GetAvailabilities(List<DevData> devs)
+        {
+            var availabilities = new List<DevAvailability>();
+            foreach (var date in devs.SelectMany(dev => dev.OnSite))
+            {
+                var devAvailability = availabilities.FirstOrDefault(availability => availability.Date == date);
+                if (devAvailability == null)
+                {
+                    availabilities.Add(new DevAvailability(date, 1));
+                }
+                else
+                {
+                    var numberOfPeople = devAvailability.NumberOfPeople + 1;
+                    availabilities.Remove(devAvailability);
+                    availabilities.Add(new DevAvailability(date, numberOfPeople));
+                }
+            }
+            return availabilities;
         }
     }
 }
