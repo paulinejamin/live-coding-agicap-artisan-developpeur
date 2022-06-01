@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using LiveCoding.Api.Controllers;
 using LiveCoding.Persistence;
@@ -138,18 +139,19 @@ namespace LiveCoding.Tests
             var boatName = "Ayers Rock";
             var boatData = new BoatData[]
                 { new() { MaxPeople = 3, Name = boatName, OpenFrom = Wednesday, OpenUntil = Wednesday.AddDays(4) } };
-            var endpoint = BuildController(barData, devData);
+            var endpoint = BuildController(barData, devData, boatData);
             endpoint.MakeBooking();
             var booking = endpoint.Get().Single();
             Check.That(booking.Date).IsEqualTo(Wednesday);
             Check.That(booking.Bar.Name).IsEqualTo(boatName);
         }
 
-        private static BookingController BuildController(BarData[] barData, DevData[] devData)
+        private static BookingController BuildController(BarData[] barData, DevData[] devData,
+            IEnumerable<BoatData> boatData = null)
         {
             var bookingRepository = new FakeBookingRepository();
             return new BookingController(new BookingService(new FakeBarRepository(barData),
-                new FakeDevRepository(devData), bookingRepository), bookingRepository);
+                new FakeDevRepository(devData), new FakeBoatRepository(boatData), bookingRepository), bookingRepository);
         }
 
         private static BarData ABar() => new()
