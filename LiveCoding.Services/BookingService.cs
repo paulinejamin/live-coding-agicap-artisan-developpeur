@@ -4,58 +4,55 @@ namespace LiveCoding.Services
 {
     public class BookingService
     {
-        private readonly IBarRepository barRepo;
-        private readonly IDevRepository devRepo;
-        private readonly IBoatRepository boatRepo;
-        private readonly IBookingRepository bookingRepository;
+        private readonly IBarRepository _barRepo;
+        private readonly IDevRepository _devRepo;
+        private readonly IBookingRepository _bookingRepository;
 
         public BookingService(IBarRepository barRepo,
             IDevRepository devRepo,
-            IBoatRepository boatRepo,
             IBookingRepository bookingRepository)
         {
-            this.barRepo = barRepo;
-            this.devRepo = devRepo;
-            this.boatRepo = boatRepo;
-            this.bookingRepository = bookingRepository;
+            _barRepo = barRepo;
+            _devRepo = devRepo;
+            _bookingRepository = bookingRepository;
         }
 
         public bool ReserveBar()
         {
-            var bars = barRepo.Get();
-            var devs = devRepo.Get();
+            var bars = _barRepo.Get();
+            var devs = _devRepo.Get().ToList();
 
-            var dictionary = new Dictionary<DateTime, int>();
+            var numberOfAvailableDevsByDate = new Dictionary<DateTime, int>();
             foreach (var devData in devs)
             {
                 foreach (var date in devData.OnSite)
                 {
-                    if (dictionary.ContainsKey(date))
+                    if (numberOfAvailableDevsByDate.ContainsKey(date))
                     {
-                        dictionary[date]++;
+                        numberOfAvailableDevsByDate[date]++;
                     }
                     else
                     {
-                        dictionary.Add(date, 1);
+                        numberOfAvailableDevsByDate.Add(date, 1);
                     }
                 }
             }
 
-            var max = dictionary.Values.Max();
+            var maxNumberOfDevs = numberOfAvailableDevsByDate.Values.Max();
 
-            if (max <= devs.Count() * 0.6)
+            if (maxNumberOfDevs <= devs.Count() * 0.6)
             {
                 return false;
             }
 
-            var dateTime = dictionary.First(kv => kv.Value == max).Key;
+            var bestDate = numberOfAvailableDevsByDate.First(kv => kv.Value == maxNumberOfDevs).Key;
 
             foreach (var barData in bars)
             {
-                if (barData.Capacity >= max && barData.Open.Contains(dateTime.DayOfWeek))
+                if (barData.Capacity >= maxNumberOfDevs && barData.Open.Contains(bestDate.DayOfWeek))
                 {
-                    BookBar(barData, dateTime);
-                    bookingRepository.Save(new BookingData() { Bar = barData, Date = dateTime });
+                    BookBar(barData, bestDate);
+                    _bookingRepository.Save(new BookingData() { Bar = barData, Date = bestDate });
                     return true;
                 }
             }
@@ -66,19 +63,6 @@ namespace LiveCoding.Services
         private void BookBar(BarData barData, DateTime dateTime)
         {
             Console.WriteLine("Bar booked: " + barData.Name + " at " + dateTime);
-        }
-
-        public void Cancel(DateTime date)
-        {
-            var booking = bookingRepository.GetUpcomingBooking(date);
-            this.SendBarCancellation(booking.Bar, booking.Date);
-            booking.IsCancelled = true;
-            bookingRepository.Save(booking);
-        }
-
-        private void SendBarCancellation(BarData bar, DateTime? date)
-        {
-            Console.WriteLine("Bar booking cancelled: " + bar + " at " + date);
         }
     }
 }

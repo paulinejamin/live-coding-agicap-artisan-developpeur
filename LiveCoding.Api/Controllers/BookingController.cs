@@ -8,32 +8,25 @@ namespace LiveCoding.Api.Controllers
     [Route("[controller]")]
     public class BookingController : ControllerBase
     {
-        private readonly BookingService bookingService;
-        private readonly IBookingRepository bookingRepository;
+        private readonly BookingService _bookingService;
+        private readonly IBookingRepository _bookingRepository;
 
         public BookingController(BookingService bookingService, IBookingRepository bookingRepository)
         {
-            this.bookingService = bookingService;
-            this.bookingRepository = bookingRepository;
+            _bookingService = bookingService;
+            _bookingRepository = bookingRepository;
         }
         
         [HttpPut]
         public bool MakeBooking()
         {
-            return bookingService.ReserveBar();
+            return _bookingService.ReserveBar();
         }
 
         [HttpGet]
         public IEnumerable<BookingData> Get()
         {
-            return bookingRepository.GetUpcomingBookings();
-        }
-
-
-        [HttpPost]
-        public void Cancel(DateTime date)
-        {
-            bookingService.Cancel(date);
+            return _bookingRepository.GetUpcomingBookings();
         }
     }
 }

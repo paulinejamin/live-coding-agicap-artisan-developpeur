@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using LiveCoding.Api.Controllers;
 using LiveCoding.Persistence;
@@ -14,12 +13,12 @@ namespace LiveCoding.Tests
         [Fact]
         public void Reserve_bar_when_at_least_60_percent_of_devs_are_available()
         {
-            var expectedBar = "La belle équipe";
-            var barData = new[]
+            var indoorBarName = "Bar La Belle Equipe";
+            var indoorBars = new[]
             {
                 ABar() with
                 {
-                    Name = expectedBar, Open = new[] { DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday }
+                    Name = indoorBarName, Open = new[] { DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday }
                 }
             };
             var devData = new[]
@@ -30,23 +29,23 @@ namespace LiveCoding.Tests
                 new DevData { Name = "Dan", OnSite = new[] { Wednesday, Thursday } },
                 new DevData { Name = "Eve", OnSite = new[] { Thursday } },
             };
-            var controller = BuildController(barData, devData);
 
+            var controller = BuildController(indoorBars, devData);
             controller.MakeBooking();
-
             var result = controller.Get().Single();
+
             Check.That(result.Date).IsEqualTo(Thursday);
-            Check.That(result.Bar.Name).IsEqualTo(expectedBar);
+            Check.That(result.Bar.Name).IsEqualTo(indoorBarName);
         }
 
         [Fact]
         public void Do_not_reserve_bar_when_only_50_percent_of_devs_are_available()
         {
-            var barData = new[]
+            var indoorBars = new[]
             {
                 ABar() with { Open = new[] { DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday } }
             };
-            var devData = new[]
+            var developers = new[]
             {
                 new DevData { Name = "Alice", OnSite = new[] { Wednesday, Friday } },
                 new DevData { Name = "Bob", OnSite = new[] { Thursday } },
@@ -54,8 +53,8 @@ namespace LiveCoding.Tests
                 new DevData { Name = "Dan", OnSite = new[] { Wednesday } },
                 new DevData { Name = "Eve", OnSite = new[] { Thursday } },
             };
-            var controller = BuildController(barData, devData);
 
+            var controller = BuildController(indoorBars, developers);
             var success = controller.MakeBooking();
 
             Check.That(success).IsFalse();
@@ -64,43 +63,41 @@ namespace LiveCoding.Tests
         [Fact]
         public void Reserve_bar_when_it_is_open()
         {
-            var expectedBar = "La belle équipe";
-            var barData = new[]
+            var indoorBarName = "Bar La Belle Equipe";
+            var indoorBars = new[]
             {
-                ABar() with { Name = expectedBar, Open = new[] { DayOfWeek.Thursday } },
+                ABar() with { Name = indoorBarName, Open = new[] { DayOfWeek.Thursday } },
                 ABar() with { Name = "Le Sirius", Open = new[] { DayOfWeek.Friday } }
             };
-            var devData = new[]
+            var developers = new[]
             {
                 new DevData { Name = "Bob", OnSite = new[] { Thursday } },
                 new DevData { Name = "Alice", OnSite = new[] { Thursday } }
             };
 
-            var controller = BuildController(barData, devData);
-
+            var controller = BuildController(indoorBars, developers);
             controller.MakeBooking();
-
             var result = controller.Get().Single();
 
             Check.That(result.Date).IsEqualTo(Thursday);
-            Check.That(result.Bar.Name).IsEqualTo(expectedBar);
+            Check.That(result.Bar.Name).IsEqualTo(indoorBarName);
         }
 
         [Fact]
         public void Do_not_reserve_bar_when_it_is_closed()
         {
-            var barData = new[]
+            var indoorBars = new[]
             {
                 ABar() with { Name = "La belle équipe", Open = new[] { DayOfWeek.Thursday } },
                 ABar() with { Name = "Le Sirius", Open = new[] { DayOfWeek.Friday } }
             };
-            var devData = new[]
+            var developers = new[]
             {
                 new DevData { Name = "Bob", OnSite = new[] { Wednesday } },
                 new DevData { Name = "Alice", OnSite = new[] { Wednesday } }
             };
-            var controller = BuildController(barData, devData);
 
+            var controller = BuildController(indoorBars, developers);
             var success = controller.MakeBooking();
 
             Check.That(success).IsFalse();
@@ -109,54 +106,35 @@ namespace LiveCoding.Tests
         [Fact]
         public void Choose_bar_that_has_enough_space()
         {
-            var barData = new[]
+            var indoorBars = new[]
             {
                 ABar() with { Capacity = 3 }
             };
-            var devData = new[]
+            var developers = new[]
             {
                 new DevData { Name = "Bob", OnSite = new[] { Wednesday, Friday } },
                 new DevData { Name = "Chad", OnSite = new[] { Wednesday } },
                 new DevData { Name = "Dan", OnSite = new[] { Wednesday } },
                 new DevData { Name = "Eve", OnSite = new[] { Wednesday } },
             };
-            var controller = BuildController(barData, devData);
 
+            var controller = BuildController(indoorBars, developers);
             var success = controller.MakeBooking();
 
             Check.That(success).IsFalse();
         }
 
-        [Fact]
-        public void Choose_boat_over_bar_when_available()
-        {
-            var barData = new[] { ABar() with { Open = new[] { DayOfWeek.Wednesday } } };
-            var devData = new DevData[]
-            {
-                new() { Name = "Bob", OnSite = new[] { Wednesday } },
-                new() { Name = "Alice", OnSite = new[] { Wednesday } },
-            };
-            var boatName = "Ayers Rock";
-            var boatData = new BoatData[]
-                { new() { MaxPeople = 3, Name = boatName, OpenFrom = Wednesday, OpenUntil = Wednesday.AddDays(4) } };
-            var endpoint = BuildController(barData, devData, boatData);
-            endpoint.MakeBooking();
-            var booking = endpoint.Get().Single();
-            Check.That(booking.Date).IsEqualTo(Wednesday);
-            Check.That(booking.Bar.Name).IsEqualTo(boatName);
-        }
-
-        private static BookingController BuildController(BarData[] barData, DevData[] devData,
-            IEnumerable<BoatData> boatData = null)
+        private static BookingController BuildController(BarData[] barData, DevData[] devData)
         {
             var bookingRepository = new FakeBookingRepository();
             return new BookingController(new BookingService(new FakeBarRepository(barData),
-                new FakeDevRepository(devData), new FakeBoatRepository(boatData), bookingRepository), bookingRepository);
+                new FakeDevRepository(devData), bookingRepository), bookingRepository);
         }
 
         private static BarData ABar() => new()
         {
-            Name = "Wallace", Capacity = 10, Food = false,
+            Name = "Wallace Pub",
+            Capacity = 10,
             Open = new[] { DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday }
         };
 

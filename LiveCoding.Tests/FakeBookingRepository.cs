@@ -7,20 +7,20 @@ namespace LiveCoding.Tests;
 
 public class FakeBookingRepository : IBookingRepository
 {
-    private readonly List<BookingData> bookings = new();
+    private readonly List<BookingData> _bookings = new();
 
     public IEnumerable<BookingData> GetUpcomingBookings()
     {
-        return bookings;
+        return _bookings;
     }
 
     public BookingData GetUpcomingBooking(DateTime date)
     {
-        return bookings.First(r => r.Date == date);
+        return _bookings.First(r => r.Date == date);
     }
 
     public void Save(BookingData booking)
     {
-        this.bookings.Add(booking);
+        _bookings.Add(booking);
     }
 }

@@ -6,15 +6,15 @@ namespace LiveCoding.Tests;
 
 public class FakeDevRepository : IDevRepository
 {
-    private readonly IEnumerable<DevData> devs;
+    private readonly IEnumerable<DevData> _devs;
 
     public FakeDevRepository(DevData[] devDatas)
     {
-        devs = devDatas;
+        _devs = devDatas;
     }
 
     public IEnumerable<DevData> Get()
     {
-        return devs;
+        return _devs;
     }
 }
