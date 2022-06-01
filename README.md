@@ -11,7 +11,7 @@ On `main` you will find the base code.
 
 ## Product requirements
 ### Rule #1: boats
-Summer is coming and we would like to add a new data source for boat bars in order to chill next to the Rhone river.
+Summer is coming and we would like to add a new data source for boat bars in order to chill next to the Rhone river. If possible, boats are always our first choice and must be booked instead of an indoor bar.
 Try to implement this without refactoring. Then do as much refactoring as needed.
 
 ### Rule #2: bar capacity

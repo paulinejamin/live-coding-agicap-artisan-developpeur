@@ -1,0 +1,31 @@
+{
+  "bars": [
+    {
+      "name": "Bar La Belle Equipe",
+      "capacity": 60,
+      "open": [
+        "Thursday",
+        "Friday",
+        "Saturday"
+      ]
+    },
+    {
+      "name": "Wallace Pub",
+      "capacity": 100,
+      "open": [
+        "Tuesday",
+        "Thursday",
+        "Friday",
+        "Saturday"
+      ]
+    },
+    {
+      "name": "Bar Ninkasi",
+      "capacity": 150,
+      "open": [
+        "Sunday",
+        "Monday"
+      ]
+    }
+  ]
+}
