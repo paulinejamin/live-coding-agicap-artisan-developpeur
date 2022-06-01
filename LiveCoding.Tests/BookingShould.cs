@@ -138,24 +138,18 @@ namespace LiveCoding.Tests
             var boatName = "Ayers Rock";
             var boatData = new BoatData[]
                 { new() { MaxPeople = 3, Name = boatName, OpenFrom = Wednesday, OpenUntil = Wednesday.AddDays(4) } };
-            var endpoint = BuildController(barData, devData, boatData);
+            var endpoint = BuildController(barData, devData);
             endpoint.MakeBooking();
             var booking = endpoint.Get().Single();
             Check.That(booking.Date).IsEqualTo(Wednesday);
             Check.That(booking.Bar.Name).IsEqualTo(boatName);
         }
 
-        private static BookingController BuildController(BarData[] barData, 
-            DevData[] devData,
-            BoatData[]? boatData = null)
+        private static BookingController BuildController(BarData[] barData, DevData[] devData)
         {
             var bookingRepository = new FakeBookingRepository();
-            return new BookingController(new BookingService(
-                    new FakeBarRepository(barData),
-                    new FakeDevRepository(devData),
-                    new FakeBoatRepository(boatData ?? Array.Empty<BoatData>()),
-                    bookingRepository),
-                bookingRepository);
+            return new BookingController(new BookingService(new FakeBarRepository(barData),
+                new FakeDevRepository(devData), bookingRepository), bookingRepository);
         }
 
         private static BarData ABar() => new()
