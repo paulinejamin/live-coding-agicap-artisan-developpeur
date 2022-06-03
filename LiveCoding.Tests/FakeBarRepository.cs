@@ -9,7 +9,7 @@ public class FakeBarRepository : IBarRepository
 
     public FakeBarRepository(IEnumerable<BarData> barData)
     {
-        _bars = barDatas;
+        _bars = barData;
     }
 
     public IEnumerable<BarData> Get()

@@ -36,7 +36,7 @@ namespace LiveCoding.Tests
             var result = controller.Get().Single();
 
             Check.That(result.Date).IsEqualTo(Thursday);
-            Check.That(result.Bar.Name).IsEqualTo(indoorBarName);
+            Check.That(result.Bar.Name.Value).IsEqualTo(indoorBarName);
         }
 
         [Fact]
@@ -81,7 +81,7 @@ namespace LiveCoding.Tests
             var result = controller.Get().Single();
 
             Check.That(result.Date).IsEqualTo(Thursday);
-            Check.That(result.Bar.Name).IsEqualTo(indoorBarName);
+            Check.That(result.Bar.Name.Value).IsEqualTo(indoorBarName);
         }
 
         [Fact]
@@ -125,7 +125,7 @@ namespace LiveCoding.Tests
             Check.That(success).IsFalse();
         }
 
-        [Fact(Skip = "Not implemented yet")]
+        [Fact]
         public void Choose_boat_over_bar_when_available()
         {
             var barData = new[] { ABar() with { Open = new[] { DayOfWeek.Wednesday } } };
@@ -141,18 +141,18 @@ namespace LiveCoding.Tests
             endpoint.MakeBooking();
             var booking = endpoint.Get().Single();
             Check.That(booking.Date).IsEqualTo(Wednesday);
-            Check.That(booking.Bar.Name).IsEqualTo(boatName);
+            Check.That(booking.Bar.Name.Value).IsEqualTo(boatName);
         }
 
         private static BookingController BuildController(BarData[] barData,
             DevData[] devData,
             BoatData[]? boatData = null)
         {
-            var bookingRepository = new FakeBookingRepository();
-            return new BookingController(new BookingService(
+            var bookingRepository = new InMemoryProvideBooking();
+            return new BookingController(new MakeABooking(new BarAdapter(
                     new FakeBarRepository(barData),
-                    new FakeDevRepository(devData),
-                    new FakeBoatRepository(boatData ?? Array.Empty<BoatData>()),
+                    new FakeBoatRepository(boatData ?? Array.Empty<BoatData>())),
+                    new DevelopersAvailabilitiesAdapter(new FakeDevRepository(devData)),
                     bookingRepository),
                 bookingRepository);
         }

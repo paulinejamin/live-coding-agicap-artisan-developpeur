@@ -9,7 +9,7 @@ public class FakeDevRepository : IDevRepository
 
     public FakeDevRepository(IEnumerable<DevData> devData)
     {
-        _devs = devDatas;
+        _devs = devData;
     }
 
     public IEnumerable<DevData> Get()
