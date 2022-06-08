@@ -124,7 +124,7 @@ namespace LiveCoding.Tests
             Check.That(success).IsFalse();
         }
 
-        [Fact(Skip = "Not implemented yet")]
+        [Fact]
         public void Choose_boat_over_bar_when_available()
         {
             var barData = new[] { ABar() with { Open = new[] { DayOfWeek.Wednesday } } };
