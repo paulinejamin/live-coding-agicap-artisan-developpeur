@@ -5,8 +5,8 @@ namespace LiveCoding.Services
     public class BookingService
     {
         private readonly IBarRepository _barRepo;
-        private readonly IDevRepository _devRepo;
         private readonly IBoatRepository _boatRepo;
+        private readonly IDevRepository _devRepo;
         private readonly IBookingRepository _bookingRepository;
 
         public BookingService(IBarRepository barRepo,
@@ -16,16 +16,16 @@ namespace LiveCoding.Services
         )
         {
             _barRepo = barRepo;
-            _devRepo = devRepo;
             _boatRepo = boatRepo;
+            _devRepo = devRepo;
             _bookingRepository = bookingRepository;
         }
 
         public bool ReserveBar()
         {
             var bars = _barRepo.Get();
-            var devs = _devRepo.Get().ToList();
             var boats = _boatRepo.Get();
+            var devs = _devRepo.Get().ToList();
 
             var allBars = GetAllBars(bars, boats);
             var availabilities = GetAvailabilities(devs);
