@@ -7,11 +7,13 @@ namespace LiveCoding.Infra.Adapters
     {
         private readonly IBarRepository barRepo;
         private readonly IBoatRepository boatRepository;
+        private readonly IRooftopRepository rooftopRepository;
 
-        public BarAdapter(IBarRepository barRepo, IBoatRepository boatRepository)
+        public BarAdapter(IBarRepository barRepo, IBoatRepository boatRepository, IRooftopRepository rooftopRepository)
         {
             this.barRepo = barRepo;
             this.boatRepository = boatRepository;
+            this.rooftopRepository = rooftopRepository;
         }
 
         public IEnumerable<Bar> GetAll()

@@ -144,14 +144,53 @@ namespace LiveCoding.Tests
             Check.That(booking.Bar.Name.Value).IsEqualTo(boatName);
         }
 
+        [Fact(Skip = "Not implemented yet")]
+        public void Do_not_choose_bar_when_available_devs_fill_more_than_80_percent_of_bar_capacity()
+        {
+            var indoorBars = new[]
+            {
+                ABar() with { Capacity = 3 }
+            };
+            var developers = new[]
+            {
+                new DevData { Name = "Bob", OnSite = new[] { Wednesday, Friday } },
+                new DevData { Name = "Chad", OnSite = new[] { Wednesday } },
+                new DevData { Name = "Dan", OnSite = new[] { Wednesday } }
+            };
+
+            var controller = BuildController(indoorBars, developers);
+            var success = controller.MakeBooking();
+
+            Check.That(success).IsFalse();
+        }
+
+        [Fact(Skip = "Not implemented yet")]
+        public void Choose_rooftop_when_available()
+        {
+            var devData = new DevData[]
+            {
+                new() { Name = "Bob", OnSite = new[] { Wednesday } },
+                new() { Name = "Alice", OnSite = new[] { Wednesday } },
+            };
+            var rooftopName = "Rooftop Le Sucre";
+            var rootopData = new RooftopData[] { new(5, rooftopName, new[] { DayOfWeek.Wednesday }) };
+            var endpoint = BuildController(Array.Empty<BarData>(), devData, Array.Empty<BoatData>(), rootopData);
+            endpoint.MakeBooking();
+            var booking = endpoint.Get().Single();
+            Check.That(booking.Date).IsEqualTo(Wednesday);
+            Check.That(booking.Bar.Name.Value).IsEqualTo(rooftopName);
+        }
+
         private static BookingController BuildController(BarData[] barData,
             DevData[] devData,
-            BoatData[]? boatData = null)
+            BoatData[]? boatData = null, 
+            RooftopData[]? rooftopDatas=null)
         {
             var bookingRepository = new InMemoryProvideBooking();
             return new BookingController(new MakeABooking(new BarAdapter(
                     new FakeBarRepository(barData),
-                    new FakeBoatRepository(boatData ?? Array.Empty<BoatData>())),
+                    new FakeBoatRepository(boatData ?? Array.Empty<BoatData>()),
+                    new FakeRooftopRepository(rooftopDatas ?? Array.Empty<RooftopData>())),
                     new DevelopersAvailabilitiesAdapter(new FakeDevRepository(devData)),
                     bookingRepository),
                 bookingRepository);

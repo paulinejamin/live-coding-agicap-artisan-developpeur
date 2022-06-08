@@ -1,0 +1,31 @@
+{
+  "rooftops": [
+    {
+      "name": "Tete d'oie",
+      "maxPeople": 60,
+      "open": [
+        "Thursday",
+        "Friday",
+        "Saturday"
+      ]
+    },
+    {
+      "name": "Le sucre",
+      "maxPeople": 100,
+      "open": [
+        "Thursday",
+        "Friday",
+        "Saturday"
+      ]
+    },
+    {
+      "name": "Mama shelter",
+      "maxPeople": 100,
+      "open": [
+        "Wednersday",
+        "Thursday",
+        "Friday"
+      ]
+    }
+  ]
+}
