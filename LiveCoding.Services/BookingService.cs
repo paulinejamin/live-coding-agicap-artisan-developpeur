@@ -4,30 +4,24 @@ namespace LiveCoding.Services
 {
     public class BookingService
     {
-        private readonly IBarRepository _barRepo;
-        private readonly IBoatRepository _boatRepo;
         private readonly IDevRepository _devRepo;
         private readonly IBookingRepository _bookingRepository;
+        private readonly IProvideBars _barAdapter;
 
-        public BookingService(IBarRepository barRepo,
-            IDevRepository devRepo,
-            IBoatRepository boatRepo,
-            IBookingRepository bookingRepository
-        )
+        public BookingService(IDevRepository devRepo,
+            IBookingRepository bookingRepository, 
+            IProvideBars barAdapter)
         {
-            _barRepo = barRepo;
-            _boatRepo = boatRepo;
             _devRepo = devRepo;
             _bookingRepository = bookingRepository;
+            _barAdapter = barAdapter;
         }
 
         public bool ReserveBar()
         {
-            var bars = _barRepo.Get();
-            var boats = _boatRepo.Get();
             var devs = _devRepo.Get().ToList();
 
-            var allBars = GetAllBars(bars, boats);
+            var allBars = _barAdapter.GetAllBars();
             var availabilities = GetAvailabilities(devs);
 
             var bestDate = BestDate.Get(availabilities, devs.Count);
@@ -44,13 +38,6 @@ namespace LiveCoding.Services
             }
 
             return false;
-        }
-
-        private static IEnumerable<Bar> GetAllBars(IEnumerable<BarData> bars, IEnumerable<BoatData> boats)
-        {
-            IEnumerable<Bar> allBars = bars.Select(b => new Bar(b.Name, b.Capacity, b.Open, false))
-                .Concat(boats.Select(b => new Bar(b.Name, b.MaxPeople, Enum.GetValues<DayOfWeek>(), true)));
-            return allBars;
         }
 
         private List<DevAvailability> GetAvailabilities(List<DevData> devs)

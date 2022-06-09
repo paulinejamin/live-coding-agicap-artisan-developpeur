@@ -148,11 +148,9 @@ namespace LiveCoding.Tests
             BoatData[]? boatData = null)
         {
             var bookingRepository = new FakeBookingRepository();
-            return new BookingController(new BookingService(
-                    new FakeBarRepository(barData),
-                    new FakeDevRepository(devData),
-                    new FakeBoatRepository(boatData ?? Array.Empty<BoatData>()),
-                    bookingRepository),
+            return new BookingController(new BookingService(new FakeDevRepository(devData),
+                    bookingRepository,
+                    new BarAdapter(new FakeBarRepository(barData),new FakeBoatRepository(boatData ?? Array.Empty<BoatData>()))),
                 bookingRepository);
         }
 
