@@ -7,7 +7,8 @@ Our goal is to share some insights on how we work currently at Agicap, being in 
 The idea of this project is : we are many devs all around Europe and when devs are coming to Lyon, we like to celebrate and go to a bar. 
 So we did a fictionnal little API to find the best date and bar to gather developers. The project was done a long time ago in n-tier architecture and did not evolve since.
 
-On `main` you will find the base code.
+On `main` you will find the base code.  
+You'll find the video record on [Artisan Developpeur Website](https://compagnon.artisandeveloppeur.fr/veille/youtube-live-coding-comment-passer-d-un-bout-de-code-crade-a-un-code-facile-a-faire-evoluer)
 
 ## Product requirements
 ### Rule #1: boats
